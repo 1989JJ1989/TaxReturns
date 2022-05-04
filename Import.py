@@ -17,3 +17,9 @@ with open("fills.csv", "r") as csv_file:
             fiscal_years.append(row["created at"].year)
         if row["size unit"] not in currencies:
             currencies[row["size unit"]] = os.path.join(os.getcwd(), row["size unit"])
+
+    # Setting up appropriate data structure
+    for currency in currencies:
+        for year in fiscal_years:
+            os.makedirs(os.path.join(currencies[currency], str(year), "BUY"))
+            os.makedirs(os.path.join(currencies[currency], str(year), "SELL"))
