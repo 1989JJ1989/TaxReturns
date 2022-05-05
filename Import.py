@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # Opening the raw data provided by Coinbase.com
-with open("fills.csv", "r+") as csv_file:
+with open("fills_cpro.csv", "r+") as csv_file:
     csv_reader = csv.DictReader(csv_file)
 
     fieldnames = csv_reader.fieldnames
@@ -44,7 +44,7 @@ for currency in currencies:
                 csv_writer = csv.DictWriter(new_file, fieldnames=fieldnames)
                 csv_writer.writeheader()
 
-                with open("fills.csv", "r+") as csv_file:
+                with open("fills_cpro.csv", "r+") as csv_file:
                     csv_reader = csv.DictReader(csv_file)
 
                     # Writing the appropriate values to the respective appropriate csv files
