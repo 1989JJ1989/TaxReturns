@@ -12,9 +12,9 @@ def convert_coinbase_basic(tobeconverted1, tobeconverted2):
 
     # Mapping the different keys in the files to be merged to align the data
     key_mapping = {
-        "portfolio": "Not Provided",
-        "trade id": "Not Provided",
-        "product": "Not Provided",
+        "portfolio": "NOT PROVIDED",
+        "trade id": "NOT PROVIDED",
+        "product": "NOT PROVIDED",
         "side": "Transaction Type",
         "created at": "Timestamp",
         "size": "Quantity Transacted",
@@ -41,7 +41,9 @@ def convert_coinbase_basic(tobeconverted1, tobeconverted2):
                 for row in csv_reader1:
                     trade = {}
                     for key, item in key_mapping.items():
-                        trade[key] = row.get(item, "Not Provided")
+                        trade[key] = row.get(item, "NOT PROVIDED")
+                        if key == "side":
+                            trade[key] = row.get(item, "NOT PROVIDED").upper()
                     csv_writer.writerow(trade)
 
                 for row in csv_reader2:

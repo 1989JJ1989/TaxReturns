@@ -1,21 +1,29 @@
 import csv
 import os
+import Consolidate as cs
 from datetime import datetime
 
-# Opening the raw data provided by Coinbase.com
-with open("fills_cpro.csv", "r+") as csv_file:
+# Creating a merged fills file out of the separate Coinbase Basic and Pro fills files
+cs.convert_coinbase_basic("fills_c.csv", "fills_cpro.csv")
+
+# Opening the merged fills file
+with open("merged_fills.csv", "r+") as csv_file:
     csv_reader = csv.DictReader(csv_file)
 
     fieldnames = csv_reader.fieldnames
 
     # Parsing fiscal years and traded currencies and changing date string to datetime object
-    fieldnames = csv_reader.fieldnames
     fiscal_years = []
     currencies = {}
     for row in csv_reader:
-        row["created at"] = datetime.strptime(
-            row["created at"], "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
+        try:
+            row["created at"] = datetime.strptime(
+                row["created at"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+        except ValueError:
+            row["created at"] = datetime.strptime(
+                row["created at"], "%Y-%m-%dT%H:%M:%SZ"
+            )
         if row["created at"].year not in fiscal_years:
             fiscal_years.append(row["created at"].year)
         if row["size unit"] not in currencies:
@@ -23,7 +31,7 @@ with open("fills_cpro.csv", "r+") as csv_file:
 
 # Setting up an appropriate data structure
 # Setting up a tree structure for each currency, year and side
-for currency in currencies:
+for currency in currencies.keys():
     for year in fiscal_years:
         for side in ["BUY", "SELL"]:
             try:
@@ -44,17 +52,23 @@ for currency in currencies:
                 csv_writer = csv.DictWriter(new_file, fieldnames=fieldnames)
                 csv_writer.writeheader()
 
-                with open("fills_cpro.csv", "r+") as csv_file:
+                with open("merged_fills.csv", "r+") as csv_file:
                     csv_reader = csv.DictReader(csv_file)
 
                     # Writing the appropriate values to the respective appropriate csv files
                     for row in csv_reader:
-                        row["created at"] = datetime.strptime(
-                            row["created at"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                        )
-                        if (
-                            row["size unit"] == currency
-                            and row["created at"].year == year
-                            and row["side"] == side
-                        ):
+                        # try:
+                        #     row["created at"] = datetime.strptime(
+                        #         row["created at"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                        #     )
+                        # except ValueError:
+                        #     row["created at"] = datetime.strptime(
+                        #         row["created at"], "%Y-%m-%dT%H:%M:%SZ"
+                        #     )
+
+                        if row["size unit"] == currency and row["side"] == side:
                             csv_writer.writerow(row)
+
+                        # # print(row["created at"])
+                        # print(row["size unit"])
+                        # print(row["side"])
